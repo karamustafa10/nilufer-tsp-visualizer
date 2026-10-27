@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nilüfer TSP – Algoritma Yarışı</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css?v=2" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <p class="eyebrow">Doğadan Esinlenmiş Algoritmalar</p>
+        <h1>Nilüfer TSP Yarışı</h1>
+      </div>
+      <div class="controls">
+        <button id="btn-play" class="btn ghost" type="button" title="Oynat / Duraklat">Duraklat</button>
+        <label class="slider-wrap">
+          <span id="frame-label">1 / 80</span>
+          <input id="frame-slider" type="range" min="0" max="79" value="0" />
+        </label>
+        <button id="btn-results" class="btn primary" type="button">Sonuçları Göster</button>
+        <button id="btn-fullscreen" class="btn ghost" type="button">Tam Ekran</button>
+      </div>
+    </header>
+
+    <section id="race-view" class="race-view">
+      <div id="maps" class="maps-grid"></div>
+      <aside class="scoreboard">
+        <h2>Canlı Skorlar</h2>
+        <ol id="live-scores"></ol>
+        <p id="status-line" class="status">Hazırlanıyor…</p>
+      </aside>
+    </section>
+
+    <section id="results-view" class="results-view hidden" aria-hidden="true">
+      <div class="results-panel">
+        <div class="results-header">
+          <div>
+            <p class="eyebrow">Karşılaştırma</p>
+            <h2>Sonuç Tablosu</h2>
+          </div>
+          <button id="btn-back" class="btn ghost" type="button">Yarışa Dön</button>
+        </div>
+        <div class="results-body">
+          <div class="table-card">
+            <table id="results-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Algoritma</th>
+                  <th>Maliyet</th>
+                  <th>İterasyon</th>
+                  <th>Süre</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="winner-map-card">
+            <h3 id="winner-title">En iyi tur</h3>
+            <div id="winner-map"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js?v=2"></script>
+</body>
+</html>

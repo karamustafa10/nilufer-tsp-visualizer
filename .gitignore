@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# OSM / osmnx cache (buyuk dosyalar)
+.cache/
+cache/
+
+# Uretilen web verisi (main.py yeniden olusturur)
+web/data.json
+
+# Test / gecici
+nilufer_basemap_test.png
+*.png
+!web/**
+
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
