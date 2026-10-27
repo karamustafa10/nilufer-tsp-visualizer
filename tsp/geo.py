@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import numpy as np
 
-# Bilinen Nilüfer mahalle / semt merkezleri (lat, lon)
+# Yol agi kapsamina guvenle dusen mahalleler (lat, lon).
+# Not: Fadilli (~28.71) ag batisinda kaldigi icin listeden cikarildi;
+# aksi halde marker ile rota birbirinden uzak dusuyordu.
 NILUFER_LANDMARKS: list[tuple[str, float, float]] = [
     ("Beşevler", 40.20000, 28.95000),
     ("Görükle", 40.23114, 28.84017),
@@ -17,23 +19,13 @@ NILUFER_LANDMARKS: list[tuple[str, float, float]] = [
     ("Misi", 40.17912, 28.97039),
     ("Tahtalı", 40.17535, 28.87707),
     ("Yaylacık", 40.17333, 28.90176),
-    ("Atlas", 40.12237, 28.88512),
+    ("Atlas", 40.12240, 28.88430),
     ("İrfaniye", 40.21658, 28.81714),
-    ("Konaklı", 40.25623, 28.75817),
     ("Yolçatı", 40.25827, 28.86994),
-    ("Başköy", 40.21175, 28.75272),
+    ("Başköy", 40.21239, 28.75294),
     ("Üçpınar", 40.10407, 28.84167),
-    ("Fadıllı", 40.15363, 28.70969),
+    ("Konaklı", 40.25623, 28.75817),
 ]
-
-# Daha yoğun kentsel alan (haritada daha okunaklı)
-NILUFER_URBAN_BBOX = {
-    "lat_min": 40.15,
-    "lat_max": 40.26,
-    "lon_min": 28.82,
-    "lon_max": 28.99,
-}
-
 
 def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """İki WGS84 noktası arasındaki büyük daire mesafesi (km)."""
@@ -59,14 +51,17 @@ def haversine_matrix(lats: np.ndarray, lons: np.ndarray) -> np.ndarray:
 def sample_nilufer_locations(
     n: int = 12,
     seed: int = 42,
-    jitter_deg: float = 0.008,
+    jitter_deg: float = 0.0,
 ) -> tuple[np.ndarray, np.ndarray, list[str]]:
     """
-    Nilüfer mahalle merkezlerinden rastgele noktalar seçer ve hafif kaydırır.
+    Nilüfer mahalle merkezlerinden rastgele noktalar seçer.
+
+    Not: Konumlar kırpılmaz; gerçek koordinatlar korunur.
+    jitter_deg varsayılan 0 (doğruluk için).
 
     Returns
     -------
-    cities : (N, 2) array of (lon, lat)  — matplotlib x/y için
+    cities : (N, 2) array of (lon, lat)
     distances : (N, N) haversine km
     labels : nokta etiketleri
     """
@@ -81,13 +76,11 @@ def sample_nilufer_locations(
 
     for k, idx in enumerate(indices):
         name, lat, lon = NILUFER_LANDMARKS[idx]
-        lat += rng.uniform(-jitter_deg, jitter_deg)
-        lon += rng.uniform(-jitter_deg, jitter_deg)
-        # Kentsel bbox içinde tut
-        lat = float(np.clip(lat, NILUFER_URBAN_BBOX["lat_min"], NILUFER_URBAN_BBOX["lat_max"]))
-        lon = float(np.clip(lon, NILUFER_URBAN_BBOX["lon_min"], NILUFER_URBAN_BBOX["lon_max"]))
-        lats[k] = lat
-        lons[k] = lon
+        if jitter_deg:
+            lat += rng.uniform(-jitter_deg, jitter_deg)
+            lon += rng.uniform(-jitter_deg, jitter_deg)
+        lats[k] = float(lat)
+        lons[k] = float(lon)
         labels.append(name)
 
     cities = np.column_stack([lons, lats])  # (lon, lat)

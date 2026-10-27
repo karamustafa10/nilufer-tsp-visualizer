@@ -75,7 +75,9 @@ class TSPProblem:
         if use_roads:
             from tsp.roads import RoadNetwork
 
-            road_network = RoadNetwork(cities)
+            road_network = RoadNetwork(cities, align_to_roads=True)
+            # Gorselde marker = yol dugumu (rota gercekten noktaya ugrar)
+            cities = road_network.cities
             distances = road_network.distances_km
             region = "Bursa Nilüfer (gercek yollar)"
 

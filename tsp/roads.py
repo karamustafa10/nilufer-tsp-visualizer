@@ -15,13 +15,14 @@ except ImportError as exc:  # pragma: no cover
 
 CACHE_DIR = Path(__file__).resolve().parent.parent / ".cache"
 GRAPH_PATH = CACHE_DIR / "nilufer_drive.graphml"
+GRAPH_PATH_V2 = CACHE_DIR / "nilufer_drive_v2.graphml"
 
-# Nilufer kentsel bbox (lat/lon) — bir miktar pad ile
+# Pad'li Nilufer bbox
 NILUFER_BBOX = {
     "north": 40.275,
-    "south": 40.10,
-    "east": 29.02,
-    "west": 28.72,
+    "south": 40.100,
+    "east": 29.020,
+    "west": 28.720,
 }
 
 
@@ -34,9 +35,11 @@ def _configure_osmnx() -> None:
 def load_or_download_graph(force: bool = False):
     """Nilufer surus agini indir veya disk onbelleginden yukle."""
     _configure_osmnx()
-    if GRAPH_PATH.exists() and not force:
-        print(f"Yol agi onbellekten yukleniyor: {GRAPH_PATH.name}")
-        return ox.load_graphml(GRAPH_PATH)
+    # Genis ag varsa onu tercih et; yoksa mevcut onbellegi kullan
+    for path in (GRAPH_PATH_V2, GRAPH_PATH):
+        if path.exists() and not force:
+            print(f"Yol agi onbellekten yukleniyor: {path.name}")
+            return ox.load_graphml(path)
 
     print("OpenStreetMap'ten Nilufer yol agi indiriliyor (ilk sefer uzun surebilir)...")
     # OSMnx 2.x: bbox = (left, bottom, right, top) = (west, south, east, north)
@@ -105,13 +108,38 @@ def _path_coords(G, path: list[int]) -> list[tuple[float, float]]:
 class RoadNetwork:
     """TSP noktalari icin yol mesafeleri ve rota geometrileri."""
 
-    def __init__(self, cities: np.ndarray, graph=None):
-        self.cities = np.asarray(cities, dtype=float)
+    def __init__(self, cities: np.ndarray, graph=None, align_to_roads: bool = True):
+        self.cities = np.asarray(cities, dtype=float).copy()
         self.G = graph if graph is not None else load_or_download_graph()
         self.nodes = snap_points_to_nodes(self.G, self.cities)
         self.n = len(self.cities)
+        self.snap_distances_m = self._snap_distances_m()
+
+        # Marker'lar rota uzerinde olsun diye noktalari yol dugumune tasi
+        if align_to_roads:
+            for i, node in enumerate(self.nodes):
+                self.cities[i, 0] = float(self.G.nodes[node]["x"])
+                self.cities[i, 1] = float(self.G.nodes[node]["y"])
+
+        far = [(i, d) for i, d in enumerate(self.snap_distances_m) if d > 400]
+        if far:
+            print("Uyari: bazi noktalar yola uzak (snap > 400 m):")
+            for i, d in far:
+                print(f"  index {i}: {d:.0f} m")
+
         self._route_cache: dict[tuple[int, int], tuple[float, list[tuple[float, float]]]] = {}
         self.distances_km = self._build_distance_matrix()
+
+    def _snap_distances_m(self) -> list[float]:
+        from tsp.geo import haversine_km
+
+        out = []
+        for i, node in enumerate(self.nodes):
+            lon, lat = self.cities[i]
+            nx_ = self.G.nodes[node]["x"]
+            ny_ = self.G.nodes[node]["y"]
+            out.append(haversine_km(lat, lon, ny_, nx_) * 1000.0)
+        return out
 
     def _route_between(self, i: int, j: int) -> tuple[float, list[tuple[float, float]]]:
         key = (i, j)
