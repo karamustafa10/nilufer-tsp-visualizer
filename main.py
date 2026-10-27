@@ -7,6 +7,7 @@ ayni anda animasyonlu karsilastirir.
 
 from __future__ import annotations
 
+import argparse
 import time
 
 from algorithms import (
@@ -28,15 +29,11 @@ def collect_steps(generator) -> tuple[list[AlgorithmStep], float]:
     return steps, time.perf_counter() - t0
 
 
-def main() -> None:
+def run_pipeline(n_cities: int = 12, seed: int = 42, n_frames: int = 80) -> list[AlgoTrack]:
     print("=" * 64)
     print("  TSP - Bursa Nilufer Algoritma Yarisi (Web)")
     print("  Greedy | PSO | ACO | Simulated Annealing | GA")
     print("=" * 64)
-
-    n_cities = 12
-    seed = 42
-    n_frames = 80
 
     print("\nGercek yol agi (OpenStreetMap) hazirlaniyor...")
     problem = TSPProblem.nilufer(n_cities=n_cities, seed=seed, use_roads=True)
@@ -80,6 +77,23 @@ def main() -> None:
     print("\nWeb verisi hazirlaniyor (rota geometrileri)...")
     data_path = write_web_data(problem, tracks, WEB_DIR, n_frames=n_frames)
     print(f"  Yazildi: {data_path}")
+    return tracks
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Nilufer TSP web gorsellestirici")
+    parser.add_argument(
+        "--export-only",
+        action="store_true",
+        help="Sadece web/data.json uret, sunucu acma (GitHub Pages icin)",
+    )
+    args = parser.parse_args()
+
+    run_pipeline()
+
+    if args.export_only:
+        print("Export tamam. Sunucu acilmiyor.")
+        return
 
     httpd = serve_and_open(port=8765, open_browser=True)
     print("\nArayuz acik. Kontroller:")

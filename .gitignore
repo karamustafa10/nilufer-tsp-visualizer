@@ -9,10 +9,9 @@ venv/
 .cache/
 cache/
 
-# Uretilen web verisi (main.py yeniden olusturur)
-web/data.json
-
 # Test / gecici
+# Not: web/data.json GitHub Pages demosu icin commit edilir
+
 nilufer_basemap_test.png
 *.png
 !web/**

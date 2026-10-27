@@ -2,6 +2,12 @@
 
 Bursa **Nilüfer** mahalleleri üzerinde Travelling Salesman Problem (TSP) için beş optimizasyon algoritmasını gerçek yol ağıyla karşılaştıran etkileşimli web uygulaması.
 
+## Canlı demo
+
+Buradan bakabilirsiniz (kurulum gerekmez):
+
+**https://karamustafa10.github.io/nilufer-tsp-visualizer/**
+
 ## Algoritmalar
 
 | Algoritma | Kısa ad |
@@ -17,26 +23,23 @@ Bursa **Nilüfer** mahalleleri üzerinde Travelling Salesman Problem (TSP) için
 - OpenStreetMap yol ağı (OSMnx) ile gerçek rota ve mesafe
 - 5 algoritmanın senkron animasyonu (Leaflet haritalar)
 - Canlı skor paneli
-- Sonuç tablosu + kazanan turun haritası (pencere kapatmadan)
+- Sonuç tablosu + kazanan turun haritası
 - Tam ekran destekli HTML/CSS arayüz
 
-## Kurulum
+## Yerel geliştirme
 
 ```powershell
 py -3 -m pip install -r requirements.txt
-```
-
-## Çalıştırma
-
-```powershell
 py -3 main.py
 ```
 
-Program algoritmaları çalıştırır, `web/data.json` üretir ve tarayıcıda arayüzü açar:
+Sadece `web/data.json` üretmek (Pages demosunu güncellemek için):
 
-`http://127.0.0.1:8765/index.html`
+```powershell
+py -3 main.py --export-only
+```
 
-Durdurmak için terminalde `Ctrl+C`.
+Yerel arayüz: `http://127.0.0.1:8765/index.html` — durdurmak için `Ctrl+C`.
 
 ### Kısayollar
 
@@ -49,17 +52,12 @@ Durdurmak için terminalde `Ctrl+C`.
 ```
 main.py                 # Giriş noktası
 algorithms/             # Greedy, PSO, ACO, SA, GA
-tsp/
-  geo.py                # Nilüfer konumları, haversine
-  roads.py              # OSM yol ağı ve rota geometrisi
-  problem.py            # TSP problemi
-  web_export.py         # JSON veri üretimi
-  webapp.py             # Yerel HTTP sunucu
-web/                    # HTML / CSS / JS arayüz
+tsp/                    # TSP, yollar, web export
+web/                    # Statik arayüz (GitHub Pages)
 ```
 
 ## Notlar
 
 - İlk çalışmada Nilüfer yol ağı indirilir ve `.cache/` altına kaydedilir.
 - Mesafe birimi kilometredir (yol üstü en kısa rota).
-- Ödev kapsamında incelenen kütüphaneler: scikit-opt, MEALPY; bu demoda eğitim amaçlı sıfırdan implementasyon + OSMnx kullanılmıştır.
+- `web/data.json` önceden üretilmiş demo verisidir; canlı sayfa bunu kullanır.
