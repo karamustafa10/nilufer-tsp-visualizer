@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ödev 2 – TSP ve Genetik Algoritma</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="odev2.css" />
+</head>
+<body>
+  <header class="top">
+    <div>
+      <p class="eyebrow">Ödev 2</p>
+      <h1>Gezgin Satıcı Problemi ve Genetik Algoritma</h1>
+    </div>
+    <a class="btn ghost" href="index.html">Tüm algoritmalara dön</a>
+  </header>
+
+  <main class="layout">
+    <article class="panel">
+      <section>
+        <h2>1) Gezgin Satıcı Problemi (TSP)</h2>
+        <p>
+          <strong>n</strong> şehir (veya durak) verildiğinde amaç, her şehri
+          <em>tam olarak bir kez</em> ziyaret eden ve başlangıç noktasına dönen
+          en kısa kapalı turu bulmaktır.
+        </p>
+        <ul>
+          <li><strong>Girdi:</strong> duraklar ve aralarındaki mesafeler</li>
+          <li><strong>Çıktı:</strong> bir permütasyon (ziyaret sırası)</li>
+          <li><strong>Amaç:</strong> toplam yol uzunluğunu en aza indirmek</li>
+          <li><strong>Kısıt:</strong> her durak bir kez; tur kapalı olmalı</li>
+        </ul>
+        <p>
+          Bu demoda duraklar Bursa <strong>Nilüfer</strong> mahalleleridir;
+          mesafe olarak OpenStreetMap yol ağı üzerindeki en kısa rota (km) kullanılır.
+        </p>
+      </section>
+
+      <section>
+        <h2>2) Problemi Genetik Algoritmaya Uygun Hale Getirme</h2>
+        <table>
+          <thead>
+            <tr><th>Bileşen</th><th>TSP karşılığı</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Kromozom</td><td>Şehir indekslerinin bir permütasyonu</td></tr>
+            <tr><td>Fitness</td><td>Tur uzunluğu (küçük olan daha iyi)</td></tr>
+            <tr><td>Seçilim</td><td>Turnuva seçilimi</td></tr>
+            <tr><td>Çaprazlama</td><td>Order Crossover (OX)</td></tr>
+            <tr><td>Mutasyon</td><td>İki konumun yer değiştirmesi (swap)</td></tr>
+            <tr><td>Elitizm</td><td>En iyi bireyler sonraki nesle aktarılır</td></tr>
+          </tbody>
+        </table>
+        <p class="params" id="params-line">Parametreler yükleniyor…</p>
+      </section>
+
+      <section>
+        <h2>3) Kodlanarak Çözüm</h2>
+        <p>
+          Genetik algoritma Python ile kodlandı
+          (<code>algorithms/ga.py</code>). Aşağıdaki harita, nesiller ilerledikçe
+          bulunan en iyi turun Nilüfer yolları üzerinde nasıl iyileştiğini gösterir.
+        </p>
+        <p id="result-line" class="result">Sonuç bekleniyor…</p>
+        <p class="links">
+          Kaynak:
+          <a href="https://github.com/karamustafa10/nilufer-tsp-visualizer" target="_blank" rel="noopener">GitHub</a>
+          ·
+          <a href="https://karamustafa10.github.io/nilufer-tsp-visualizer/" target="_blank" rel="noopener">Canlı demo</a>
+        </p>
+      </section>
+    </article>
+
+    <aside class="viz">
+      <div class="viz-bar">
+        <button id="btn-play" class="btn primary" type="button">Duraklat</button>
+        <label class="slider-wrap">
+          <span id="frame-label">1 / 1</span>
+          <input id="frame-slider" type="range" min="0" max="0" value="0" />
+        </label>
+      </div>
+      <div id="map"></div>
+      <p id="map-meta" class="map-meta">Harita yükleniyor…</p>
+    </aside>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="odev2.js"></script>
+</body>
+</html>

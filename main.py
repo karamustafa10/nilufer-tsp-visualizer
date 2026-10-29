@@ -19,7 +19,7 @@ from algorithms import (
 )
 from tsp.problem import AlgorithmStep, TSPProblem
 from tsp.common import ALGORITHM_COLORS, AlgoTrack
-from tsp.web_export import write_web_data
+from tsp.web_export import write_odev2_data, write_web_data
 from tsp.webapp import WEB_DIR, serve_and_open
 
 
@@ -80,6 +80,47 @@ def run_pipeline(n_cities: int = 12, seed: int = 42, n_frames: int = 80) -> list
     return tracks
 
 
+def run_odev2_export(n_cities: int = 12, seed: int = 42) -> None:
+    """Odev 2: sadece Genetik Algoritma verisini uret."""
+    print("=" * 64)
+    print("  Odev 2 - TSP + Genetik Algoritma export")
+    print("=" * 64)
+    print("\nGercek yol agi hazirlaniyor...")
+    problem = TSPProblem.nilufer(n_cities=n_cities, seed=seed, use_roads=True)
+    params = {
+        "population_size": 50,
+        "n_generations": 100,
+        "crossover_rate": 0.8,
+        "mutation_rate": 0.2,
+        "tournament_size": 3,
+        "elitism": 2,
+    }
+    print("GA calistiriliyor...")
+    steps, elapsed = collect_steps(
+        genetic_algorithm(
+            problem,
+            population_size=params["population_size"],
+            n_generations=params["n_generations"],
+            crossover_rate=params["crossover_rate"],
+            mutation_rate=params["mutation_rate"],
+            tournament_size=params["tournament_size"],
+            elitism=params["elitism"],
+            seed=seed,
+        )
+    )
+    last = steps[-1]
+    best = last.best_cost if last.best_cost is not None else last.cost
+    print(f"  en iyi {best:.2f} {problem.unit} | {elapsed:.3f}s")
+    track = AlgoTrack(
+        name="GA",
+        steps=steps,
+        color=ALGORITHM_COLORS["GA"],
+        elapsed_sec=elapsed,
+    )
+    path = write_odev2_data(problem, track, WEB_DIR, n_frames=100, params=params)
+    print(f"Yazildi: {path}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Nilufer TSP web gorsellestirici")
     parser.add_argument(
@@ -87,7 +128,17 @@ def main() -> None:
         action="store_true",
         help="Sadece web/data.json uret, sunucu acma (GitHub Pages icin)",
     )
+    parser.add_argument(
+        "--export-odev2",
+        action="store_true",
+        help="Sadece Odev 2 GA sayfasi icin odev2-data.json uret",
+    )
     args = parser.parse_args()
+
+    if args.export_odev2:
+        run_odev2_export()
+        print("Odev 2 export tamam.")
+        return
 
     run_pipeline()
 

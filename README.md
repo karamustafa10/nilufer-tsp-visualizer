@@ -8,6 +8,10 @@ Buradan bakabilirsiniz (kurulum gerekmez):
 
 **https://karamustafa10.github.io/nilufer-tsp-visualizer/**
 
+Ödev 2 (TSP + Genetik Algoritma) sayfası:
+
+**https://karamustafa10.github.io/nilufer-tsp-visualizer/odev2.html**
+
 ## Algoritmalar
 
 | Algoritma | Kısa ad |

@@ -126,3 +126,74 @@ def write_web_data(
         encoding="utf-8",
     )
     return data_path
+
+
+def write_odev2_data(
+    problem: TSPProblem,
+    track: AlgoTrack,
+    out_dir: Path,
+    n_frames: int = 100,
+    params: dict[str, Any] | None = None,
+) -> Path:
+    """Odev 2 sayfasi icin sadece GA animasyon verisi."""
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    route_cache: dict[tuple[int, ...], list[list[float]]] = {}
+    aligned = resample_steps(track.steps, n_frames)
+    frames = []
+    for step in aligned:
+        best_tour = step.best_tour if step.best_tour is not None else step.tour
+        best_cost = step.best_cost if step.best_cost is not None else step.cost
+        frames.append(
+            {
+                "iteration": int(step.iteration),
+                "cost": float(step.cost),
+                "best_cost": float(best_cost),
+                "info": step.info,
+                "route": _route_coords(problem, best_tour, route_cache),
+            }
+        )
+
+    last = track.steps[-1]
+    final_tour = last.best_tour if last.best_tour is not None else last.tour
+    final_cost = last.best_cost if last.best_cost is not None else last.cost
+    points = []
+    for i, label in enumerate(problem.labels):
+        lon, lat = problem.cities[i]
+        points.append({"id": i, "label": label, "lat": float(lat), "lon": float(lon)})
+    lats = [p["lat"] for p in points]
+    lons = [p["lon"] for p in points]
+
+    payload = {
+        "unit": problem.unit or "km",
+        "region": problem.region_name,
+        "seed": problem.seed,
+        "interval_ms": 120,
+        "params": params
+        or {
+            "population_size": 50,
+            "n_generations": 100,
+            "crossover_rate": 0.8,
+            "mutation_rate": 0.2,
+            "tournament_size": 3,
+            "elitism": 2,
+        },
+        "final_cost": float(final_cost),
+        "final_iterations": int(last.iteration),
+        "elapsed_sec": float(track.elapsed_sec),
+        "final_route": _route_coords(problem, final_tour, route_cache),
+        "bounds": {
+            "south": min(lats) - 0.01,
+            "north": max(lats) + 0.01,
+            "west": min(lons) - 0.01,
+            "east": max(lons) + 0.01,
+        },
+        "points": points,
+        "frames": frames,
+    }
+    data_path = out_dir / "odev2-data.json"
+    data_path.write_text(
+        json.dumps(payload, ensure_ascii=False, separators=(",", ":")),
+        encoding="utf-8",
+    )
+    return data_path
