@@ -197,3 +197,72 @@ def write_odev2_data(
         encoding="utf-8",
     )
     return data_path
+
+
+def write_odev3_data(
+    problem: Any,
+    steps: list[Any],
+    elapsed_sec: float,
+    out_dir: Path,
+    n_frames: int = 60,
+    params: dict[str, Any] | None = None,
+) -> Path:
+    """Odev 3 sayfasi icin ACO knapsack animasyon verisi."""
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    if not steps:
+        raise ValueError("Bos adim listesi")
+    if len(steps) == 1:
+        aligned = steps * n_frames
+    else:
+        indices = np.linspace(0, len(steps) - 1, n_frames)
+        aligned = [steps[int(round(i))] for i in indices]
+
+    frames = []
+    for step in aligned:
+        selected = step.best_selected if step.best_selected is not None else step.selected
+        value = step.best_value if step.best_value is not None else step.total_value
+        weight = step.best_weight if step.best_weight is not None else step.total_weight
+        pheromone = step.pheromone
+        frames.append(
+            {
+                "iteration": int(step.iteration),
+                "selected": [int(i) for i in selected],
+                "value": float(value),
+                "weight": float(weight),
+                "info": step.info,
+                "pheromone": [float(x) for x in pheromone] if pheromone is not None else None,
+            }
+        )
+
+    last = steps[-1]
+    final_selected = last.best_selected if last.best_selected is not None else last.selected
+    final_value = last.best_value if last.best_value is not None else last.total_value
+    final_weight = last.best_weight if last.best_weight is not None else last.total_weight
+
+    payload = {
+        "interval_ms": 140,
+        "params": params
+        or {
+            "n_ants": 30,
+            "n_iterations": 60,
+            "alpha": 1.0,
+            "beta": 2.0,
+            "rho": 0.15,
+            "q": 100.0,
+        },
+        "problem": problem.to_dict(),
+        "final_selected": [int(i) for i in final_selected],
+        "final_value": float(final_value),
+        "final_weight": float(final_weight),
+        "final_iterations": int(last.iteration),
+        "elapsed_sec": float(elapsed_sec),
+        "frames": frames,
+    }
+    data_path = out_dir / "odev3-data.json"
+    data_path.write_text(
+        json.dumps(payload, ensure_ascii=False, separators=(",", ":")),
+        encoding="utf-8",
+    )
+    return data_path

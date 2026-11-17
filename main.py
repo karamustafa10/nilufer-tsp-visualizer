@@ -17,9 +17,11 @@ from algorithms import (
     particle_swarm_optimization,
     simulated_annealing,
 )
+from algorithms.aco_knapsack import ant_colony_knapsack
+from algorithms.knapsack import KnapsackProblem
 from tsp.problem import AlgorithmStep, TSPProblem
 from tsp.common import ALGORITHM_COLORS, AlgoTrack
-from tsp.web_export import write_odev2_data, write_web_data
+from tsp.web_export import write_odev2_data, write_odev3_data, write_web_data
 from tsp.webapp import WEB_DIR, serve_and_open
 
 
@@ -121,6 +123,47 @@ def run_odev2_export(n_cities: int = 12, seed: int = 42) -> None:
     print(f"Yazildi: {path}")
 
 
+def run_odev3_export(n_items: int = 18, seed: int = 42) -> None:
+    """Odev 3: Sirt Cantasi + ACO verisini uret."""
+    print("=" * 64)
+    print("  Odev 3 - Knapsack + Karinca Kolonisi export")
+    print("=" * 64)
+    problem = KnapsackProblem.random(n_items=n_items, capacity_ratio=0.45, seed=seed)
+    params = {
+        "n_ants": 30,
+        "n_iterations": 60,
+        "alpha": 1.0,
+        "beta": 2.0,
+        "rho": 0.15,
+        "q": 100.0,
+    }
+    print(f"Esya: {problem.n_items} | kapasite: {problem.capacity:.1f} {problem.unit_weight}")
+    print("ACO calistiriliyor...")
+    steps, elapsed = collect_steps(
+        ant_colony_knapsack(
+            problem,
+            n_ants=params["n_ants"],
+            n_iterations=params["n_iterations"],
+            alpha=params["alpha"],
+            beta=params["beta"],
+            rho=params["rho"],
+            q=params["q"],
+            seed=seed,
+        )
+    )
+    last = steps[-1]
+    best_value = last.best_value if last.best_value is not None else last.total_value
+    best_weight = last.best_weight if last.best_weight is not None else last.total_weight
+    print(
+        f"  en iyi {best_value:.0f} {problem.unit_value} "
+        f"({best_weight:.1f}/{problem.capacity:.1f} {problem.unit_weight}) | {elapsed:.3f}s"
+    )
+    path = write_odev3_data(
+        problem, steps, elapsed, WEB_DIR, n_frames=60, params=params
+    )
+    print(f"Yazildi: {path}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Nilufer TSP web gorsellestirici")
     parser.add_argument(
@@ -133,11 +176,21 @@ def main() -> None:
         action="store_true",
         help="Sadece Odev 2 GA sayfasi icin odev2-data.json uret",
     )
+    parser.add_argument(
+        "--export-odev3",
+        action="store_true",
+        help="Sadece Odev 3 Knapsack+ACO sayfasi icin odev3-data.json uret",
+    )
     args = parser.parse_args()
 
     if args.export_odev2:
         run_odev2_export()
         print("Odev 2 export tamam.")
+        return
+
+    if args.export_odev3:
+        run_odev3_export()
+        print("Odev 3 export tamam.")
         return
 
     run_pipeline()

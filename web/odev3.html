@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ödev 3 – Sırt Çantası ve Karınca Kolonisi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="odev3.css" />
+</head>
+<body>
+  <header class="top">
+    <div>
+      <p class="eyebrow">Ödev 3</p>
+      <h1>Sırt Çantası Problemi ve Karınca Kolonisi</h1>
+    </div>
+    <div class="top-actions">
+      <a class="btn ghost" href="odev2.html">Ödev 2</a>
+      <a class="btn ghost" href="index.html">Tüm algoritmalara dön</a>
+    </div>
+  </header>
+
+  <main class="layout">
+    <article class="panel">
+      <section>
+        <h2>1) Sırt Çantası Problemi (Knapsack)</h2>
+        <p>
+          Verilen bir <strong>kapasite</strong> sınırına göre, her birinin ağırlığı ve değeri
+          bilinen eşyalar arasından bir alt küme seçilir. Amaç, kapasiteyi aşmadan
+          <em>toplam değeri en büyük</em> yapan seçimi bulmaktır.
+        </p>
+        <ul>
+          <li><strong>Girdi:</strong> eşya listesi (ağırlık, değer) ve çanta kapasitesi</li>
+          <li><strong>Çıktı:</strong> seçilen / seçilmeyen kararlar (0-1)</li>
+          <li><strong>Amaç:</strong> toplam değeri maksimize etmek</li>
+          <li><strong>Kısıt:</strong> toplam ağırlık ≤ kapasite</li>
+        </ul>
+        <p>
+          Bu demoda <strong>18 rastgele eşya</strong> üretilir; kapasite toplam ağırlığın
+          yaklaşık %45’idir. Değer birimi TL, ağırlık birimi kg’dır.
+        </p>
+      </section>
+
+      <section>
+        <h2>2) Problemi Karınca Kolonisine Uygun Hale Getirme</h2>
+        <table>
+          <thead>
+            <tr><th>ACO bileşeni</th><th>Knapsack karşılığı</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Graf / düğüm</td><td>Her eşya bir seçim adayı</td></tr>
+            <tr><td>Feromon (τ)</td><td>Eşyanın seçilme eğilimi</td></tr>
+            <tr><td>Sezgisel (η)</td><td>Değer / ağırlık oranı</td></tr>
+            <tr><td>Karınca turu</td><td>Kapasiteye sığan eşya kümesi</td></tr>
+            <tr><td>Tur kalitesi</td><td>Toplam değer (yüksek olan daha iyi)</td></tr>
+            <tr><td>Buharlaşma (ρ)</td><td>Eski seçimlerin etkisini azaltma</td></tr>
+          </tbody>
+        </table>
+        <p>
+          Seçim olasılığı:
+          <code>P(i) ∝ τᵢ<sup>α</sup> · ηᵢ<sup>β</sup></code>
+          (yalnızca kapasiteye sığan eşyalar için).
+        </p>
+        <p class="params" id="params-line">Parametreler yükleniyor…</p>
+      </section>
+
+      <section>
+        <h2>3) Kodlanarak Çözüm</h2>
+        <p>
+          Karınca kolonisi Python ile kodlandı
+          (<code>algorithms/aco_knapsack.py</code>). Sağdaki grafik, iterasyonlar
+          ilerledikçe en iyi seçimin nasıl iyileştiğini gösterir; yeşil çubuklar
+          seçilen eşyalardır.
+        </p>
+        <p id="result-line" class="result">Sonuç bekleniyor…</p>
+        <p class="links">
+          Kaynak:
+          <a href="https://github.com/karamustafa10/nilufer-tsp-visualizer" target="_blank" rel="noopener">GitHub</a>
+          ·
+          <a href="https://karamustafa10.github.io/nilufer-tsp-visualizer/odev3.html" target="_blank" rel="noopener">Canlı demo</a>
+        </p>
+      </section>
+    </article>
+
+    <aside class="viz">
+      <div class="viz-bar">
+        <button id="btn-play" class="btn primary" type="button">Duraklat</button>
+        <label class="slider-wrap">
+          <span id="frame-label">1 / 1</span>
+          <input id="frame-slider" type="range" min="0" max="0" value="0" />
+        </label>
+      </div>
+      <div class="stats" id="stats-line">Yükleniyor…</div>
+      <div class="chart-wrap">
+        <canvas id="bar-chart" width="720" height="320" aria-label="Eşya değer/ağırlık çubuk grafiği"></canvas>
+      </div>
+      <div class="table-wrap">
+        <table id="items-table">
+          <thead>
+            <tr>
+              <th>Seçim</th>
+              <th>Eşya</th>
+              <th>Ağırlık</th>
+              <th>Değer</th>
+              <th>Oran</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p id="chart-meta" class="map-meta">Grafik yükleniyor…</p>
+    </aside>
+  </main>
+
+  <script src="odev3.js"></script>
+</body>
+</html>

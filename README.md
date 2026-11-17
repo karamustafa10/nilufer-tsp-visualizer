@@ -12,6 +12,10 @@ Buradan bakabilirsiniz (kurulum gerekmez):
 
 **https://karamustafa10.github.io/nilufer-tsp-visualizer/odev2.html**
 
+Ödev 3 (Sırt Çantası + Karınca Kolonisi) sayfası:
+
+**https://karamustafa10.github.io/nilufer-tsp-visualizer/odev3.html**
+
 ## Algoritmalar
 
 | Algoritma | Kısa ad |
@@ -41,6 +45,12 @@ Sadece `web/data.json` üretmek (Pages demosunu güncellemek için):
 
 ```powershell
 py -3 main.py --export-only
+```
+
+Ödev 3 verisi:
+
+```powershell
+py -3 main.py --export-odev3
 ```
 
 Yerel arayüz: `http://127.0.0.1:8765/index.html` — durdurmak için `Ctrl+C`.
